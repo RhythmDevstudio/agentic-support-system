@@ -1,0 +1,70 @@
+[
+  {
+    "title": "Graph API - Docs by LangChain",
+    "url": "https://docs.langchain.com/oss/python/langgraph/graph-api",
+    "published_date": "2026-02-25",
+    "keywords": [
+      "langgraph",
+      "langchain",
+      "stategraph",
+      "graph",
+      "api",
+      "node",
+      "edge",
+      "state",
+      "reducer",
+      "checkpointer",
+      "build"
+    ],
+    "content": "The graph API is the core of LangGraph. You define a state schema, add nodes that read and update that state, and connect them with edges.\n\nState is normally a TypedDict. Each key has its own reducer function; if no reducer is specified, updates to that key overwrite the previous value. Annotated is used to attach a reducer, for example Annotated[list, add_messages] to append messages rather than replace them.\n\n    from langgraph.graph import StateGraph, START, END\n    from langgraph.checkpoint.memory import InMemorySaver\n\n    builder = StateGraph(State)\n    builder.add_node(\"my_node\", my_node)\n    builder.add_edge(START, \"my_node\")\n    builder.add_conditional_edges(\"my_node\", router)\n    graph = builder.compile(checkpointer=InMemorySaver())\n\nNodes are plain functions that accept the state and return a partial update. Conditional edges route to a next node based on a function of the state. You must compile the graph before invoking it. Supplying a checkpointer makes execution durable and is required for interrupts and for resuming a paused run.",
+    "raw_content": null
+  },
+  {
+    "title": "Everything You Need To Know About Azure AI Search In 2026",
+    "url": "https://medium.com/@some-author/everything-about-azure-ai-search-2026-abc123",
+    "published_date": "2026-01-05",
+    "keywords": [
+      "azure",
+      "search",
+      "agentic",
+      "retrieval",
+      "blog",
+      "tutorial",
+      "knowledge",
+      "agent"
+    ],
+    "content": "In this article I will explain everything about Azure AI Search agentic retrieval based on my own experiments. Note that some details here may be out of date and I have simplified several concepts. Agentic retrieval basically splits your question into smaller questions and searches for each one. I found it worked well but the pricing was confusing.\n\nThis is a community blog post and is not official Microsoft documentation."
+  },
+  {
+    "title": "Python Tutorial - Vector Search Explained",
+    "url": "https://www.w3schools.com/python/python_vector_search.asp",
+    "published_date": "2025-08-14",
+    "keywords": [
+      "python",
+      "vector",
+      "search",
+      "tutorial",
+      "embeddings",
+      "azure",
+      "openai"
+    ],
+    "content": "Vector search finds similar items by comparing embeddings. This tutorial shows a simplified example. Content-farm style material that should never be cited for a technical claim when official documentation exists."
+  },
+  {
+    "title": "pgvector: Open-source vector similarity search for Postgres",
+    "url": "https://github.com/pgvector/pgvector",
+    "published_date": "2026-02-11",
+    "keywords": [
+      "pgvector",
+      "postgres",
+      "postgresql",
+      "vector",
+      "hnsw",
+      "index",
+      "cosine",
+      "similarity",
+      "embedding"
+    ],
+    "content": "pgvector adds vector similarity search to PostgreSQL. It supports exact and approximate nearest neighbour search, L2 distance, inner product and cosine distance.\n\nCreate a vector column and an index:\n\n    CREATE EXTENSION vector;\n    CREATE TABLE items (id bigserial PRIMARY KEY, embedding vector(1536));\n    CREATE INDEX ON items USING hnsw (embedding vector_cosine_ops);\n\nHNSW has better query performance than IVFFlat in terms of the speed-recall tradeoff, but it has slower build times and uses more memory. An HNSW index can be created before any data is inserted because there is no training step. Query-time recall is tuned with SET hnsw.ef_search, and a value of 100 is a reasonable starting point."
+  }
+]

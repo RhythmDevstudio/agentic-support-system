@@ -1,0 +1,71 @@
+[
+  {
+    "title": "Tools - OpenAI Agents SDK",
+    "url": "https://openai.github.io/openai-agents-python/tools/",
+    "published_date": "2026-03-04",
+    "keywords": [
+      "openai",
+      "agents",
+      "sdk",
+      "tools",
+      "tool",
+      "function",
+      "decorator",
+      "use",
+      "how",
+      "python",
+      "schema"
+    ],
+    "content": "Tools let agents take actions: fetching data, running code, calling APIs, and using a computer. The Agents SDK provides three classes of tool.\n\nHosted tools run on OpenAI servers alongside the model. Local execution tools such as ComputerTool, ApplyPatchTool and ShellTool run in your own runtime. Function tools let you use any Python function as a tool.\n\nTo turn a Python function into a tool, apply the tool decorator:\n\n    from agents.decorators import tool\n\n    @tool\n    async def fetch_weather(location: Location) -> str:\n        \"\"\"Fetch the weather for a given location.\"\"\"\n        return \"sunny\"\n\nThe SDK sets the tool up automatically. The tool name is taken from the Python function name, the tool description is taken from the function docstring, the input schema is generated from the function signature's type annotations, and descriptions for each argument are parsed from the docstring using griffe.\n\nTools are attached to an agent by passing them in the tools list:\n\n    from agents import Agent\n\n    agent = Agent(\n        name=\"Assistant\",\n        tools=[fetch_weather, read_file],\n    )\n\nBoth synchronous and asynchronous functions are supported. A function may optionally accept a RunContextWrapper as its first parameter to receive the run context. Tool behaviour can be customised with options such as a name override and a custom failure error function."
+  },
+  {
+    "title": "Agents - OpenAI Agents SDK",
+    "url": "https://openai.github.io/openai-agents-python/agents/",
+    "published_date": "2026-03-04",
+    "keywords": [
+      "openai",
+      "agents",
+      "sdk",
+      "agent",
+      "runner",
+      "instructions",
+      "handoff",
+      "configure"
+    ],
+    "content": "An Agent is the core building block of the Agents SDK. An agent is a large language model configured with instructions, a set of tools, optional handoffs to other agents, and optional guardrails.\n\nAn agent is created by supplying a name and instructions, and optionally a model, a tools list, and an output type:\n\n    from agents import Agent, Runner\n\n    agent = Agent(\n        name=\"Support Agent\",\n        instructions=\"You help customers with account questions.\",\n        tools=[lookup_account],\n    )\n\n    result = await Runner.run(agent, \"What is my plan?\")\n    print(result.final_output)\n\nThe Runner executes the agent loop: it calls the model, executes any tool calls the model produces, appends the tool results to the conversation, and repeats until the model produces a final output with no further tool calls.\n\nSetting an output_type causes the SDK to request structured output from the model and to validate the result against that type."
+  },
+  {
+    "title": "Structured Outputs | OpenAI API",
+    "url": "https://developers.openai.com/api/docs/guides/structured-outputs",
+    "published_date": "2026-02-18",
+    "keywords": [
+      "structured",
+      "outputs",
+      "json",
+      "schema",
+      "pydantic",
+      "parse",
+      "openai",
+      "api",
+      "response",
+      "format"
+    ],
+    "content": "Structured Outputs ensures a model's response conforms to a JSON Schema you supply, so you do not have to validate or retry malformed JSON.\n\nWith the Python SDK, pass a Pydantic model as the text_format argument to responses.parse:\n\n    from openai import OpenAI\n    from pydantic import BaseModel\n\n    client = OpenAI()\n\n    class CalendarEvent(BaseModel):\n        name: str\n        date: str\n        participants: list[str]\n\n    response = client.responses.parse(\n        model=\"gpt-6-astra\",\n        input=[\n            {\"role\": \"system\", \"content\": \"Extract the event information.\"},\n            {\"role\": \"user\", \"content\": \"Alice and Bob are going to a science fair on Friday.\"},\n        ],\n        text_format=CalendarEvent,\n    )\n\n    event = response.output_parsed\n\nThe parsed object is available on response.output_parsed. Safety-based model refusals are programmatically detectable: when a model declines a request, the response contains a refusal content item rather than content matching your schema, so your code should check for it before reading the parsed value."
+  },
+  {
+    "title": "Vector embeddings | OpenAI API",
+    "url": "https://developers.openai.com/api/docs/guides/embeddings",
+    "published_date": "2026-01-09",
+    "keywords": [
+      "embeddings",
+      "embedding",
+      "vector",
+      "dimensions",
+      "openai",
+      "text",
+      "similarity",
+      "search"
+    ],
+    "content": "An embedding is a vector representation of text that captures its meaning, so that related pieces of text have similar vectors. Embeddings are commonly used for search, clustering, recommendation and classification.\n\nThe text-embedding-3-small and text-embedding-3-large models are the current embedding models. By default, text-embedding-3-large returns a vector of 3072 dimensions and text-embedding-3-small returns 1536 dimensions.\n\nEmbeddings can be shortened by passing the dimensions parameter, which removes values from the end of the vector without the embedding losing its concept-representing properties. This lets you trade a small amount of accuracy for a smaller index. On the MTEB benchmark, a text-embedding-3-large embedding shortened to 256 dimensions still outperforms an unshortened text-embedding-ada-002 embedding of 1536 dimensions.\n\nSimilarity between two embeddings is normally measured with cosine similarity."
+  }
+]

@@ -1,0 +1,74 @@
+[
+  {
+    "title": "Agentic retrieval - Azure AI Search | Microsoft Learn",
+    "url": "https://learn.microsoft.com/en-us/azure/search/agentic-retrieval-overview",
+    "published_date": "2026-02-10",
+    "keywords": [
+      "agentic",
+      "retrieval",
+      "azure",
+      "search",
+      "knowledge",
+      "agent",
+      "subquery",
+      "subqueries",
+      "query",
+      "planning",
+      "rag",
+      "configure"
+    ],
+    "content": "Agentic retrieval in Azure AI Search is a complete retrieval-augmented generation (RAG) pipeline with LLM-assisted query planning, multi-source access, and structured responses optimized for agent consumption.\n\nWhen a user submits a complex query, the pipeline sends the query and the conversation history to a large language model, which generates focused subqueries. The subqueries are run in parallel against the configured knowledge sources. Each subquery is semantically reranked to promote the most relevant matches, and the best results are combined into a single unified response that a language model can use to generate a grounded answer.\n\nKey concepts:\n\n- A knowledge source is a top-level resource on your Azure AI Search service that defines the content used in an agentic retrieval pipeline. When multiple knowledge sources are configured, the engine queries all of them in a single request and generates subqueries for each one.\n- A knowledge agent references one or more knowledge sources. The knowledge agent is the object you create and then call to run agentic retrieval.\n- Retrieval reasoning effort controls how much query planning is performed. At low and medium reasoning effort, the knowledge base sends the query and conversation history to a model that generates focused subqueries.\n\nAgentic retrieval differs from a single-shot vector query in that query decomposition is performed by a model rather than by the caller, and the response is a unified, ranked result set rather than one result list per query.\n\nTo configure agentic retrieval you create a knowledge source that points at your index or other supported content, create a knowledge agent that references that knowledge source, and then issue retrieve requests against the knowledge agent."
+  },
+  {
+    "title": "Quickstart: Run agentic retrieval - Azure AI Search | Microsoft Learn",
+    "url": "https://learn.microsoft.com/en-us/azure/search/search-get-started-agentic-retrieval",
+    "published_date": "2026-01-22",
+    "keywords": [
+      "quickstart",
+      "agentic",
+      "retrieval",
+      "azure",
+      "search",
+      "configure",
+      "setup",
+      "knowledge",
+      "agent",
+      "how"
+    ],
+    "content": "This quickstart shows how to configure and run agentic retrieval in Azure AI Search.\n\nPrerequisites: an Azure AI Search service on a supported tier and region, an Azure OpenAI resource with a supported chat model deployment, and a search index containing the content you want to query.\n\nSteps:\n\n1. Create a knowledge source that points at your search index. The knowledge source defines the content available to the pipeline.\n2. Create a knowledge agent and reference the knowledge source. The knowledge agent holds the model connection used for query planning.\n3. Send a retrieve request to the knowledge agent, passing the conversation messages. The service plans subqueries, executes them in parallel, semantically ranks the results, and returns a unified response.\n4. Pass the returned content to your chat model to generate a grounded answer.\n\nThe response includes the extracted content, the activity record describing the subqueries that were planned and run, and references that map result content back to the source documents in your index."
+  },
+  {
+    "title": "What is a knowledge source? - Azure AI Search | Microsoft Learn",
+    "url": "https://learn.microsoft.com/en-us/azure/search/agentic-knowledge-source-overview",
+    "published_date": "2026-02-03",
+    "keywords": [
+      "knowledge",
+      "source",
+      "azure",
+      "search",
+      "agentic",
+      "index",
+      "blob",
+      "content"
+    ],
+    "content": "A knowledge source is a top-level resource on your Azure AI Search service that defines content used in an agentic retrieval pipeline.\n\nA knowledge source can wrap an existing search index, or it can point at supported external content that the service indexes on your behalf. A knowledge agent references one or more knowledge sources, which allows flexible configuration of how content is accessed and processed.\n\nWhen multiple knowledge sources are attached to a knowledge agent, the agentic retrieval engine queries all of them within a single request. Subqueries are generated per knowledge source and the top results from each are merged into the retrieval response."
+  },
+  {
+    "title": "Retrieval Augmented Generation (RAG) in Azure AI Search | Microsoft Learn",
+    "url": "https://learn.microsoft.com/en-us/azure/search/retrieval-augmented-generation-overview",
+    "published_date": "2025-11-30",
+    "keywords": [
+      "rag",
+      "retrieval",
+      "augmented",
+      "generation",
+      "azure",
+      "search",
+      "vector",
+      "hybrid",
+      "semantic",
+      "ranking"
+    ],
+    "content": "Retrieval Augmented Generation (RAG) is an architecture that adds an information retrieval system to a large language model, so that generated answers are grounded in your own content.\n\nAzure AI Search provides the retrieval half of that architecture. It supports keyword search, vector search, and hybrid search that combines both, along with an optional semantic ranker that reranks the top results using a language-understanding model.\n\nIn a typical RAG pattern, the application sends the user question to Azure AI Search, receives the highest-scoring passages, and passes those passages to a chat model along with instructions to answer only from the supplied content. Because the passages carry document identifiers, the application can present citations back to the user."
+  }
+]

@@ -1,0 +1,62 @@
+BILLING FREQUENTLY ASKED QUESTIONS
+Document owner: Billing Operations
+Version: 1.8
+Last reviewed: 2026-01-28
+
+Q: Why was I charged twice this month?
+
+A: The most common cause is a retry after an initial authorization failure. The
+first charge usually appears as a pending authorization and drops off within 3 to 5
+business days without ever settling. If both charges have settled, it is a duplicate
+charge and is refunded in full regardless of the standard refund window. Refer to the
+Refund Policy document for the duplicate charge verification steps.
+
+Q: When will my refund appear?
+
+A: The company controls only the submission date. Once submitted, the funds return on
+the payment processor's schedule: 5 to 10 business days for cards, 3 to 7 business
+days for UPI and net banking, 3 to 5 business days for PayPal. Never promise a date
+the processor controls.
+
+Q: Can I get a refund to a different card?
+
+A: No. Refunds are always returned to the original payment method. If that card is
+closed, the customer must contact their issuing bank, which is obliged to forward the
+funds to the replacement account.
+
+Q: What is the difference between a cancellation and a refund?
+
+A: Cancellation stops future billing. It does not by itself return money already
+charged. A customer who wants both must be handled as two actions: a cancellation
+processed by the Retention queue and a refund evaluated under the Refund Policy.
+
+Q: Why did my subscription renew after I cancelled?
+
+A: Cancellation takes effect at the end of the current billing period unless the
+customer explicitly requests immediate termination. If a charge occurred after a
+recorded cancellation request, that is a billing error and qualifies for a goodwill
+refund exception.
+
+Q: The customer is disputing a charge with their bank. What do I do?
+
+A: Once a chargeback is filed, stop processing the refund and escalate to the billing
+manager. Issuing a refund on a charge that is already under dispute results in a
+double credit that must then be recovered from the customer.
+
+Q: A customer says their payment failed but money left their account.
+
+A: This is an authorization hold, not a settled charge. Holds release automatically,
+typically within 3 to 5 business days. Confirm in the billing system that no
+settlement record exists before telling the customer it will release.
+
+Q: What currencies do we bill in?
+
+A: USD, EUR, GBP and INR. The billing currency is fixed at signup and cannot be
+changed on an existing subscription. Changing currency requires cancelling and
+re-subscribing, which the Retention queue handles.
+
+Q: Are taxes refundable?
+
+A: Tax collected is refunded proportionally with the refunded amount. Tax already
+remitted to an authority in a closed period is still refunded to the customer; the
+recovery is handled internally by Finance and is not the customer's concern.

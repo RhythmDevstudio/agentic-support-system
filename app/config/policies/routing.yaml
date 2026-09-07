@@ -1,0 +1,222 @@
+# =============================================================================
+# Ticket routing policy - DETERMINISTIC.
+#
+# The LLM produces {intent, urgency, language, confidence} only.
+# It NEVER names a queue. Queue selection happens here, in code, from this file.
+# An intent or queue absent from this file is rejected by the validator.
+# =============================================================================
+
+version: 1
+
+# ---------------------------------------------------------------------------
+# Closed vocabulary. The classification schema is generated from these lists,
+# so the model is structurally unable to emit a value outside them.
+# ---------------------------------------------------------------------------
+intents:
+  - payment_issue
+  - refund_request
+  - login_issue
+  - password_reset
+  - technical_issue
+  - bug_report
+  - account_issue
+  - cancellation
+  - feature_request
+  - security_issue
+  - general_query
+
+urgency_levels:
+  - critical
+  - high
+  - medium
+  - low
+
+queues:
+  billing_support:
+    display_name: Billing Support
+    sla_hours: 8
+    description: Payments, invoices, refunds, chargebacks.
+  account_support:
+    display_name: Account Support
+    sla_hours: 12
+    description: Authentication, access, profile and account lifecycle.
+  technical_support:
+    display_name: Technical Support
+    sla_hours: 24
+    description: Product defects, integration and technical failures.
+  product_feedback:
+    display_name: Product Feedback
+    sla_hours: 120
+    description: Feature requests and enhancement suggestions.
+  retention:
+    display_name: Retention
+    sla_hours: 24
+    description: Cancellations and win-back.
+  security_escalation:
+    display_name: Security Escalation
+    sla_hours: 1
+    description: Suspected breach, account compromise, vulnerability reports.
+  general_support:
+    display_name: General Support
+    sla_hours: 48
+    description: Catch-all for unclassified or general questions.
+  human_triage:
+    display_name: Human Triage
+    sla_hours: 4
+    description: Low-confidence or ambiguous tickets requiring a human to sort.
+
+# ---------------------------------------------------------------------------
+# Primary intent -> queue map. Exhaustive over `intents`; startup validation
+# fails loudly if an intent has no rule.
+# ---------------------------------------------------------------------------
+routing_rules:
+  payment_issue: billing_support
+  refund_request: billing_support
+  login_issue: account_support
+  password_reset: account_support
+  technical_issue: technical_support
+  bug_report: technical_support
+  account_issue: account_support
+  cancellation: retention
+  feature_request: product_feedback
+  security_issue: security_escalation
+  general_query: general_support
+
+# Queue used when classification confidence falls below the configured floor,
+# or when validation rejects the model's output.
+fallback_queue: human_triage
+
+# ---------------------------------------------------------------------------
+# Overrides applied AFTER the primary rule, in order. First match wins.
+# These encode business policy that must not depend on model judgement.
+# ---------------------------------------------------------------------------
+overrides:
+  - name: security_always_escalates
+    description: Any security-flagged ticket goes to security regardless of urgency.
+    when:
+      intent: security_issue
+    then:
+      queue: security_escalation
+      min_urgency: high
+
+  - name: critical_security_keywords
+    description: >
+      Explicit compromise language forces security routing even if the model
+      classified the ticket as something milder.
+    when:
+      any_keyword:
+        - account hacked
+        - hacked
+        - unauthorized access
+        - unauthorised access
+        - data breach
+        - data leak
+        - stolen credentials
+        - someone else logged in
+        - phishing
+        - ransomware
+    then:
+      queue: security_escalation
+      urgency: critical
+
+  - name: critical_urgency_escalates
+    description: Critical tickets always create an escalation record.
+    when:
+      urgency: critical
+    then:
+      create_escalation: true
+
+# ---------------------------------------------------------------------------
+# Urgency floors. Certain intents cannot be ranked below a minimum urgency,
+# regardless of what the model returns.
+# ---------------------------------------------------------------------------
+urgency_floors:
+  security_issue: high
+  payment_issue: medium
+  refund_request: medium
+
+# Signals that raise urgency by one level (applied at most once).
+urgency_escalation_keywords:
+  - urgent
+  - urgently
+  - immediately
+  - asap
+  - emergency
+  - critical
+  - blocked
+  - cannot work
+  - production down
+  - outage
+  - turant          # Hindi: immediately
+  - jaldi           # Hindi: quickly
+  - bahut zaroori   # Hindi: very important
+
+# ---------------------------------------------------------------------------
+# Human-in-the-loop. Actions listed here CANNOT be executed by the agent
+# without an explicit recorded approval, regardless of model confidence.
+# ---------------------------------------------------------------------------
+approval_policy:
+  required_for_actions:
+    - issue_refund
+    - account_deletion
+    - account_closure
+    - security_escalation
+    - priority_override
+    - sla_waiver
+    - bulk_ticket_update
+  required_for_conditions:
+    - name: high_value_customer
+      description: Any mutating action on an enterprise/high-value account.
+      customer_tier_in: [enterprise, platinum]
+    - name: critical_urgency
+      description: Any mutating action on a critical-urgency ticket.
+      urgency_in: [critical]
+    - name: low_confidence
+      description: Classification too weak to act on autonomously.
+      max_confidence: 0.55
+  # Actions the agent may always take unattended - read-only or additive only.
+  auto_approved_actions:
+    - get_ticket
+    - get_customer
+    - get_customer_history
+    - add_ticket_comment
+    - assign_queue
+    - update_priority
+
+# ---------------------------------------------------------------------------
+# Language handling. Normalised codes only; the model's raw guess is mapped
+# through this table so downstream systems get a stable vocabulary.
+# ---------------------------------------------------------------------------
+languages:
+  supported:
+    - code: en
+      name: English
+    - code: hi
+      name: Hindi
+    - code: hi-Latn
+      name: Hinglish        # Hindi written in Latin script / code-mixed
+    - code: es
+      name: Spanish
+    - code: fr
+      name: French
+    - code: de
+      name: German
+    - code: pt
+      name: Portuguese
+    - code: ar
+      name: Arabic
+    - code: zh
+      name: Chinese
+    - code: ja
+      name: Japanese
+    - code: ta
+      name: Tamil
+    - code: bn
+      name: Bengali
+  default: en
+  # Queues staffed for a given language; used to annotate the routing decision.
+  # Unlisted languages fall back to English handling with a translation flag.
+  supported_by_agents:
+    - en
+    - hi
+    - hi-Latn

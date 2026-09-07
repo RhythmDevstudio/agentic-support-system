@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Account Access and Login Troubleshooting Guide</title>
+  <style>body { font-family: sans-serif; }</style>
+  <script>console.log("this script must not appear in extracted text");</script>
+</head>
+<body>
+  <nav>Home | Support | Billing | Account</nav>
+
+  <main>
+    <h1>Account Access and Login Troubleshooting Guide</h1>
+    <p>Document owner: Account Support. Version 4.0. Last reviewed 2026-02-18.</p>
+
+    <h2>Scope</h2>
+    <p>
+      This guide covers login failures, password resets, multi-factor authentication
+      problems and account lockouts. It does not cover billing questions or suspected
+      account compromise; suspected compromise follows the Security Escalation
+      procedure instead.
+    </p>
+
+    <h2>Login Failure Triage</h2>
+    <p>
+      Work through these causes in order. Most login failures resolve at step one or
+      two, and jumping straight to a password reset hides the real cause.
+    </p>
+    <ol>
+      <li>Confirm the customer is using the correct account email. Customers with both
+        a personal and a work account frequently attempt the wrong one.</li>
+      <li>Check whether the account is locked. Five consecutive failed attempts trigger
+        a 30-minute automatic lockout.</li>
+      <li>Check whether the account is suspended for non-payment. A suspended account
+        rejects valid credentials without saying why.</li>
+      <li>Check the multi-factor authentication status. A replaced phone is the single
+        most common cause of a login failure that looks like a wrong password.</li>
+      <li>Only then offer a password reset.</li>
+    </ol>
+
+    <h2>Password Reset Procedure</h2>
+    <p>
+      Password resets are self-service. Support staff never set a password on a
+      customer's behalf and never send a password over any channel.
+    </p>
+    <ol>
+      <li>Verify the customer's identity against the account email and one additional
+        factor from the account record.</li>
+      <li>Trigger the reset email from the admin console. Do not read the reset link
+        aloud or paste it into the ticket.</li>
+      <li>The reset link is valid for 60 minutes and can be used once.</li>
+      <li>If the customer does not receive the email, check the suppression list before
+        re-sending. Repeated sends to a suppressed address will never arrive.</li>
+    </ol>
+
+    <h2>Account Lockout</h2>
+    <p>
+      Automatic lockouts clear after 30 minutes. An agent may clear a lockout early
+      after identity verification. A lockout that recurs immediately after being
+      cleared indicates automated credential-stuffing against the account and must be
+      raised as a security escalation rather than cleared again.
+    </p>
+
+    <h2>Multi-Factor Authentication Recovery</h2>
+    <p>
+      A customer who has lost their MFA device must complete identity verification
+      before MFA is reset. MFA reset is a high-risk action: it requires approval from
+      an account support lead, and it is recorded in the account audit log. Never reset
+      MFA on the basis of an email request alone.
+    </p>
+
+    <h2>Account Closure</h2>
+    <p>
+      Account deletion is irreversible and removes customer data within 30 days. It
+      always requires explicit human approval and an explicit confirmation from the
+      account owner, not merely from a user on the account. An automated agent may
+      prepare a closure request but may never execute one.
+    </p>
+  </main>
+
+  <footer>Internal use only. Do not distribute outside the company.</footer>
+</body>
+</html>

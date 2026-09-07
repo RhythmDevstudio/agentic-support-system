@@ -1,0 +1,36 @@
+# Secrets - never commit
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+htmlcov/
+.coverage
+
+# Local data / artifacts
+data/*.db
+data/*.db-journal
+data/*.sqlite3
+*.log
+eval_results/
+
+# macOS / external drive noise
+.DS_Store
+._*
+.Spotlight-V100
+.Trashes
+
+# Editors
+.idea/
+.vscode/
+!.vscode/settings.json

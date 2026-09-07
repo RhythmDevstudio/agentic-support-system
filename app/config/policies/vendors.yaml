@@ -1,0 +1,276 @@
+# =============================================================================
+# Official source policy
+#
+# Maps a detected technology/vendor onto the set of domains that count as
+# authoritative for it. The agent may PROPOSE a vendor key; it can never
+# propose a domain. Domains come only from this file.
+#
+# domain_mode:
+#   strict -> hard-restrict search to `official_domains` (Tavily include_domains_mode=filter)
+#   prefer -> strongly boost official domains, allow others (Tavily ...=boost)
+# =============================================================================
+
+version: 1
+
+defaults:
+  domain_mode: strict
+  # Applied when no vendor matches and the question still needs external evidence.
+  fallback_domain_mode: prefer
+  fallback_domains: []
+
+# Authority tiers drive result ranking. Lower number = more authoritative.
+# Every retrieved web result is assigned a tier; the agent is shown the tier and
+# synthesis prefers lower-tier evidence when sources disagree.
+authority_tiers:
+  1:
+    name: official_documentation
+    description: First-party product/user documentation published by the vendor.
+  2:
+    name: official_api_reference
+    description: First-party API/SDK reference material.
+  3:
+    name: official_repository
+    description: Vendor-owned source repositories, changelogs and release notes.
+  4:
+    name: authoritative_secondary
+    description: Standards bodies, peer-reviewed or otherwise vetted publishers.
+  5:
+    name: community
+    description: Blogs, forums, Q&A. Used only when nothing better exists.
+
+# Domains that are never acceptable as a citation for a technical claim.
+# Content-farm and AI-scraped mirror sites.
+blocked_domains:
+  - w3schools.com
+  - geeksforgeeks.org
+  - tutorialspoint.com
+  - javatpoint.com
+
+# Non-vendor domains that are still reasonably authoritative (tier 4).
+authoritative_secondary_domains:
+  - ietf.org
+  - rfc-editor.org
+  - w3.org
+  - iso.org
+  - nist.gov
+  - owasp.org
+  - python.org
+  - postgresql.org
+
+vendors:
+  microsoft_azure:
+    display_name: Microsoft Azure
+    # Matching is deterministic keyword/alias matching over the question text;
+    # the LLM's own vendor guess is treated as one more signal, not as truth.
+    aliases:
+      - azure
+      - azure ai search
+      - azure openai
+      - azure cognitive search
+      - cognitive services
+      - microsoft
+      - entra
+      - microsoft entra
+      - azure functions
+      - cosmos db
+      - power platform
+      - dotnet
+      - .net
+      - c#
+    official_domains:
+      - learn.microsoft.com
+      - azure.microsoft.com
+      - devblogs.microsoft.com
+      - techcommunity.microsoft.com
+    domain_tiers:
+      learn.microsoft.com: 1
+      azure.microsoft.com: 2
+      devblogs.microsoft.com: 3
+      techcommunity.microsoft.com: 4
+    repositories:
+      - github.com/Azure
+      - github.com/microsoft
+    domain_mode: strict
+
+  openai:
+    display_name: OpenAI
+    aliases:
+      - openai
+      - openai agents sdk
+      - agents sdk
+      - gpt
+      - responses api
+      - chat completions
+      - assistants api
+      - function calling
+      - structured outputs
+      - dall-e
+      - whisper
+      - text-embedding-3
+    official_domains:
+      - platform.openai.com
+      - developers.openai.com
+      - openai.com
+      - openai.github.io
+      - cookbook.openai.com
+    domain_tiers:
+      developers.openai.com: 1
+      platform.openai.com: 1
+      openai.github.io: 2
+      cookbook.openai.com: 3
+      openai.com: 3
+    repositories:
+      - github.com/openai
+    domain_mode: strict
+
+  langchain:
+    display_name: LangChain / LangGraph
+    aliases:
+      - langchain
+      - langgraph
+      - langsmith
+      - langserve
+      - stategraph
+      - create_react_agent
+      - langchain expression language
+      - lcel
+    official_domains:
+      - docs.langchain.com
+      - langchain-ai.github.io
+      - blog.langchain.dev
+      - python.langchain.com
+    domain_tiers:
+      docs.langchain.com: 1
+      langchain-ai.github.io: 2
+      python.langchain.com: 2
+      blog.langchain.dev: 3
+    repositories:
+      - github.com/langchain-ai
+    domain_mode: strict
+
+  aws:
+    display_name: Amazon Web Services
+    aliases:
+      - aws
+      - amazon web services
+      - bedrock
+      - amazon bedrock
+      - sagemaker
+      - lambda
+      - dynamodb
+      - s3
+      - amazon s3
+      - opensearch
+      - ec2
+      - cloudformation
+    official_domains:
+      - docs.aws.amazon.com
+      - aws.amazon.com
+      - awslabs.github.io
+    domain_tiers:
+      docs.aws.amazon.com: 1
+      aws.amazon.com: 2
+      awslabs.github.io: 3
+    repositories:
+      - github.com/aws
+      - github.com/awslabs
+    domain_mode: strict
+
+  google_cloud:
+    display_name: Google Cloud
+    aliases:
+      - google cloud
+      - gcp
+      - vertex ai
+      - gemini
+      - bigquery
+      - firestore
+      - cloud run
+      - google kubernetes engine
+      - gke
+    official_domains:
+      - cloud.google.com
+      - ai.google.dev
+      - developers.google.com
+      - googleapis.github.io
+    domain_tiers:
+      cloud.google.com: 1
+      ai.google.dev: 1
+      developers.google.com: 2
+      googleapis.github.io: 3
+    repositories:
+      - github.com/googleapis
+      - github.com/GoogleCloudPlatform
+    domain_mode: strict
+
+  anthropic:
+    display_name: Anthropic
+    aliases:
+      - anthropic
+      - claude
+      - claude api
+      - model context protocol
+      - mcp
+      - claude code
+    official_domains:
+      - docs.anthropic.com
+      - anthropic.com
+      - modelcontextprotocol.io
+    domain_tiers:
+      docs.anthropic.com: 1
+      modelcontextprotocol.io: 1
+      anthropic.com: 3
+    repositories:
+      - github.com/anthropics
+    domain_mode: strict
+
+  postgresql:
+    display_name: PostgreSQL
+    aliases:
+      - postgres
+      - postgresql
+      - pgvector
+      - psql
+      - plpgsql
+    official_domains:
+      - postgresql.org
+      - www.postgresql.org
+    domain_tiers:
+      postgresql.org: 1
+      www.postgresql.org: 1
+    repositories:
+      - github.com/pgvector
+    domain_mode: strict
+
+  kubernetes:
+    display_name: Kubernetes
+    aliases:
+      - kubernetes
+      - k8s
+      - kubectl
+      - helm
+      - container orchestration
+    official_domains:
+      - kubernetes.io
+      - helm.sh
+    domain_tiers:
+      kubernetes.io: 1
+      helm.sh: 1
+    repositories:
+      - github.com/kubernetes
+    domain_mode: strict
+
+  servicenow:
+    display_name: ServiceNow
+    aliases:
+      - servicenow
+      - now platform
+      - snow itsm
+    official_domains:
+      - docs.servicenow.com
+      - developer.servicenow.com
+    domain_tiers:
+      docs.servicenow.com: 1
+      developer.servicenow.com: 2
+    repositories: []
+    domain_mode: strict

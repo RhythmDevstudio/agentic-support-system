@@ -1,0 +1,278 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Support & Knowledge Assistant</title>
+<style>
+  :root {
+    --bg: #0f1117; --panel: #171a23; --border: #2a2e3a; --text: #e6e8ee;
+    --muted: #8b90a0; --accent: #5b8cff; --good: #35c48a; --warn: #f5a524; --bad: #f5556b;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  }
+  header {
+    padding: 20px 28px; border-bottom: 1px solid var(--border);
+    display: flex; align-items: baseline; gap: 12px;
+  }
+  header h1 { font-size: 17px; margin: 0; }
+  header span { color: var(--muted); font-size: 13px; }
+  main { max-width: 860px; margin: 0 auto; padding: 24px 20px 60px; }
+  .tabs { display: flex; gap: 8px; margin-bottom: 20px; }
+  .tab {
+    padding: 9px 16px; border-radius: 8px; cursor: pointer; font-size: 14px;
+    border: 1px solid var(--border); color: var(--muted); background: var(--panel);
+  }
+  .tab.active { color: var(--text); border-color: var(--accent); background: #1b2030; }
+  .panel { display: none; }
+  .panel.active { display: block; }
+  textarea, input {
+    width: 100%; background: var(--panel); border: 1px solid var(--border);
+    border-radius: 10px; color: var(--text); padding: 12px 14px; font-size: 14px;
+    font-family: inherit; resize: vertical;
+  }
+  textarea:focus, input:focus { outline: none; border-color: var(--accent); }
+  label { display: block; font-size: 13px; color: var(--muted); margin: 14px 0 6px; }
+  button {
+    margin-top: 18px; padding: 11px 20px; border-radius: 8px; border: none;
+    background: var(--accent); color: white; font-size: 14px; font-weight: 600;
+    cursor: pointer;
+  }
+  button:disabled { opacity: 0.5; cursor: default; }
+  .examples { margin-top: 10px; display: flex; flex-wrap: wrap; gap: 6px; }
+  .example {
+    font-size: 12px; color: var(--muted); border: 1px solid var(--border);
+    border-radius: 999px; padding: 5px 11px; cursor: pointer; background: transparent;
+  }
+  .example:hover { color: var(--text); border-color: var(--accent); }
+  #result { margin-top: 26px; display: none; }
+  .card {
+    background: var(--panel); border: 1px solid var(--border); border-radius: 12px;
+    padding: 18px 20px; margin-bottom: 14px;
+  }
+  .card h3 { margin: 0 0 10px; font-size: 13px; color: var(--muted); text-transform: uppercase;
+    letter-spacing: 0.04em; }
+  .answer { line-height: 1.6; font-size: 14.5px; white-space: pre-wrap; }
+  .citation { border-top: 1px solid var(--border); padding-top: 10px; margin-top: 10px; font-size: 13px; }
+  .citation:first-child { border-top: none; padding-top: 0; margin-top: 0; }
+  .citation a { color: var(--accent); text-decoration: none; word-break: break-all; }
+  .citation a:hover { text-decoration: underline; }
+  .tier { display: inline-block; font-size: 11px; padding: 1px 7px; border-radius: 999px;
+    background: #1b2030; color: var(--muted); margin-left: 6px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; }
+  .stat { background: #1b2030; border-radius: 10px; padding: 12px 14px; }
+  .stat .k { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; }
+  .stat .v { font-size: 17px; font-weight: 600; margin-top: 3px; }
+  .badge { display: inline-block; padding: 2px 9px; border-radius: 999px; font-size: 12px; font-weight: 600; }
+  .badge.critical, .badge.high { background: rgba(245,85,107,0.15); color: var(--bad); }
+  .badge.medium { background: rgba(245,165,36,0.15); color: var(--warn); }
+  .badge.low { background: rgba(53,196,138,0.15); color: var(--good); }
+  .flag { font-size: 13px; color: var(--warn); margin-top: 4px; }
+  .muted { color: var(--muted); font-size: 13px; }
+  #status { margin-top: 14px; font-size: 13px; color: var(--muted); display: none; }
+  .caveat { font-size: 13px; color: var(--warn); margin-top: 4px; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🔎 Support &amp; Knowledge Assistant</h1>
+  <span>ask a question or paste a ticket — answers are grounded in documentation, with citations</span>
+</header>
+
+<main>
+  <div class="tabs">
+    <div class="tab active" data-tab="research">Ask a question</div>
+    <div class="tab" data-tab="ticket">Submit a ticket</div>
+  </div>
+
+  <!-- RESEARCH -->
+  <div class="panel active" id="panel-research">
+    <label for="question">Your question</label>
+    <textarea id="question" rows="3" placeholder="e.g. What is Azure AI Search agentic retrieval?"></textarea>
+    <div class="examples">
+      <div class="example" data-fill="question">What is Azure AI Search agentic retrieval?</div>
+      <div class="example" data-fill="question">How do I use OpenAI Agents SDK tools?</div>
+      <div class="example" data-fill="question">How do we process refunds according to our company policy?</div>
+    </div>
+    <button id="ask-btn" onclick="askQuestion()">Search &amp; Answer</button>
+  </div>
+
+  <!-- TICKET -->
+  <div class="panel" id="panel-ticket">
+    <label for="subject">Subject (optional)</label>
+    <input id="subject" placeholder="e.g. Payment issue">
+    <label for="ticket-text">Describe the issue</label>
+    <textarea id="ticket-text" rows="4" placeholder="e.g. My payment was deducted twice and I urgently need a refund."></textarea>
+    <div class="examples">
+      <div class="example" data-fill="ticket-text">My payment was deducted twice and I urgently need a refund.</div>
+      <div class="example" data-fill="ticket-text">Mera account login nahi ho raha.</div>
+      <div class="example" data-fill="ticket-text">Someone else logged in to our admin account, I think it's hacked.</div>
+    </div>
+    <button id="ticket-btn" onclick="submitTicket()">Classify &amp; Route</button>
+  </div>
+
+  <div id="status"></div>
+  <div id="result"></div>
+</main>
+
+<script>
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.onclick = () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById('panel-' + tab.dataset.tab).classList.add('active');
+    document.getElementById('result').style.display = 'none';
+    document.getElementById('status').style.display = 'none';
+  };
+});
+
+document.querySelectorAll('.example').forEach(ex => {
+  ex.onclick = () => { document.getElementById(ex.dataset.fill).value = ex.textContent; };
+});
+
+function escapeHtml(s) {
+  const d = document.createElement('div');
+  d.textContent = s || '';
+  return d.innerHTML;
+}
+
+function setStatus(msg) {
+  const el = document.getElementById('status');
+  el.textContent = msg;
+  el.style.display = msg ? 'block' : 'none';
+}
+
+async function askQuestion() {
+  const question = document.getElementById('question').value.trim();
+  if (!question) return;
+  const btn = document.getElementById('ask-btn');
+  btn.disabled = true;
+  document.getElementById('result').style.display = 'none';
+  setStatus('Searching documentation…');
+
+  try {
+    const res = await fetch('/api/research', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ question })
+    });
+    if (!res.ok) throw new Error('Server returned ' + res.status);
+    const data = await res.json();
+    renderResearch(data);
+  } catch (err) {
+    setStatus('Error: ' + err.message);
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+function renderResearch(data) {
+  setStatus('');
+  const el = document.getElementById('result');
+  el.style.display = 'block';
+
+  let citationsHtml = '<p class="muted">No verified citations.</p>';
+  if (data.citations && data.citations.length) {
+    citationsHtml = data.citations.map(c => `
+      <div class="citation">
+        <strong>${c.marker}</strong> ${escapeHtml(c.title)}
+        <span class="tier">${escapeHtml(c.source_type.replace(/_/g, ' '))}</span>
+        ${c.url ? `<div><a href="${c.url}" target="_blank" rel="noopener">${escapeHtml(c.url)}</a></div>` : ''}
+        ${c.page ? `<div class="muted">page ${c.page}</div>` : ''}
+        ${c.section ? `<div class="muted">${escapeHtml(c.section)}</div>` : ''}
+      </div>`).join('');
+  }
+
+  const caveats = (data.caveats || []).map(c => `<div class="caveat">⚠ ${escapeHtml(c)}</div>`).join('');
+  const insufficientBanner = data.insufficient_evidence
+    ? '<div class="caveat">⚠ Not enough verified evidence was found — nothing was fabricated.</div>'
+    : '';
+
+  el.innerHTML = `
+    <div class="card">
+      <h3>Answer${data.vendor ? ' &middot; ' + escapeHtml(data.vendor) : ''}</h3>
+      <div class="answer">${escapeHtml(data.answer)}</div>
+      ${insufficientBanner}
+      ${caveats}
+    </div>
+    <div class="card">
+      <h3>Sources (${data.citations.length})</h3>
+      ${citationsHtml}
+    </div>
+    <div class="card">
+      <h3>How the agent got here</h3>
+      <div class="muted">${(data.decision_log || []).map(escapeHtml).join('<br>')}</div>
+      <div class="muted" style="margin-top:8px">tools used: ${escapeHtml((data.tools_used || []).join(', ') || 'none')}</div>
+    </div>
+  `;
+}
+
+async function submitTicket() {
+  const subject = document.getElementById('subject').value.trim();
+  const text = document.getElementById('ticket-text').value.trim();
+  if (!text) return;
+  const btn = document.getElementById('ticket-btn');
+  btn.disabled = true;
+  document.getElementById('result').style.display = 'none';
+  setStatus('Classifying ticket…');
+
+  try {
+    const res = await fetch('/api/tickets/triage', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ subject, text })
+    });
+    if (!res.ok) throw new Error('Server returned ' + res.status);
+    const data = await res.json();
+    renderTicket(data);
+  } catch (err) {
+    setStatus('Error: ' + err.message);
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+function renderTicket(data) {
+  setStatus('');
+  const el = document.getElementById('result');
+  el.style.display = 'block';
+  const c = data.classification;
+
+  el.innerHTML = `
+    <div class="card">
+      <h3>Classification</h3>
+      <div class="grid">
+        <div class="stat"><div class="k">Intent</div><div class="v">${escapeHtml(c.intent)}</div></div>
+        <div class="stat"><div class="k">Urgency</div><div class="v"><span class="badge ${c.urgency}">${escapeHtml(c.urgency)}</span></div></div>
+        <div class="stat"><div class="k">Language</div><div class="v">${escapeHtml(c.language)}</div></div>
+        <div class="stat"><div class="k">Confidence</div><div class="v">${(c.confidence * 100).toFixed(0)}%</div></div>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Routing decision</h3>
+      <div class="answer"><strong>${escapeHtml(data.queue_display_name)}</strong> (SLA ${data.sla_hours}h)</div>
+      ${data.requires_escalation ? '<div class="flag">🚨 Escalation triggered</div>' : ''}
+      ${data.requires_human_approval ? `<div class="flag">🔒 Requires human approval: ${escapeHtml((data.approval_reasons || []).join('; '))}</div>` : ''}
+    </div>
+    <div class="card">
+      <h3>How the agent got here</h3>
+      <div class="muted">${(data.decision_log || []).map(escapeHtml).join('<br>')}</div>
+      <div class="muted" style="margin-top:8px">rules applied: ${escapeHtml((data.applied_rules || []).join(', '))}</div>
+    </div>
+  `;
+}
+
+document.getElementById('question').addEventListener('keydown', e => {
+  if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) askQuestion();
+});
+document.getElementById('ticket-text').addEventListener('keydown', e => {
+  if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) submitTicket();
+});
+</script>
+</body>
+</html>
