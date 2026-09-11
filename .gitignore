@@ -20,6 +20,8 @@ htmlcov/
 # Local data / artifacts
 data/*.db
 data/*.db-journal
+data/*.db-shm
+data/*.db-wal
 data/*.sqlite3
 *.log
 eval_results/
