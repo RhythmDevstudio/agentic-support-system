@@ -1,0 +1,14 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "functions": {
+    "index.py": {
+      "maxDuration": 30,
+      "excludeFiles": "{tests/**,scripts/**,docs/**,.venv/**,**/*.docx,**/__pycache__/**}"
+    }
+  },
+  "env": {
+    "SQLITE_PATH": "/tmp/support_agent.db",
+    "VECTOR_STORE": "sqlite",
+    "LOG_FORMAT": "json"
+  }
+}
